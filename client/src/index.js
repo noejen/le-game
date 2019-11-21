@@ -19,7 +19,7 @@ function Square(props) {
     );
   }
 }
-  
+
 class Board extends React.Component {
 
   renderSquare(i) {
@@ -57,9 +57,14 @@ class Game extends React.Component {
       }],
       stepNumber: 0,
       xIsNext: true,
+      
       room: null,
+      
       board: null,
       players: [],
+      currentTurn: '',
+      winner: '',
+      draw: false,
     };
 
     var client = new Colyseus.Client('ws://localhost:2567');
@@ -69,17 +74,27 @@ class Game extends React.Component {
       this.setState({ room });
 
       room.onStateChange((state) => {
-        const { players, board } = state;
+        const { players, board, currentTurn, winner, draw} = state;
+
         this.setState({
           players,
-          board
+          board,
+          currentTurn,
+          winner,
+          draw
         });
 
-        console.log(players,board, state);
+        console.log("STATE CHANGE", this.state);
       });
     
-      room.onMessage((message) => {
-        console.log(client.id, "received on", room.name, message);
+      room.onMessage((data) => {
+        console.log(client.id, "received on", room.name, data);
+
+        if (data.action === "chat") {
+          var p = document.createElement("p");
+          p.innerHTML = `${data.playerSessionId}: ${data.message}`;
+          document.querySelector("#messages").appendChild(p);
+        }
       });
     
       room.onError(() => {
@@ -165,6 +180,11 @@ class Game extends React.Component {
     return (
       <div className="game">
         <div className="game-board">
+        { this.state.currentTurn === undefined &&
+          <div>
+            Waiting for players
+          </div>
+        }
           <Board
             squaresHighlight={winner.squares}
             squares={current.squares}
