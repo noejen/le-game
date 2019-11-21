@@ -81,6 +81,20 @@ class Game extends React.Component {
       room.onLeave(() => {
         console.log(client.id, "left", room.name);
       });
+
+      document.querySelector("#form").onsubmit = function(e) {
+        e.preventDefault();
+        var input = document.querySelector("#input");
+        console.log("input:", input.value);
+        // send data to room
+        room.send({ 
+          action: 'chat',
+          message: input.value 
+        });
+        // clear input
+        input.value = "";
+      }
+
     }).catch(e => {
       console.log("JOIN ERROR", e);
     });
