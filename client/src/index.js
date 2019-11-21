@@ -160,6 +160,10 @@ class Game extends React.Component {
   }
 
   handleClick(i) {
+    if(!this.state.currentTurn) {
+      return;
+    }
+
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
@@ -175,36 +179,11 @@ class Game extends React.Component {
     });
   }
 
-  jumpTo(step) {
-    this.setState({
-      stepNumber: step,
-      xIsNext: (step % 2) === 0,
-    })
-  }
 
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
     const winner = { name: null, squares: [] };
-
-    const moves = history.map((step, move) => {
-      const desc = move ?
-        'Go to move #' + move :
-        'Go to game start';
-      if(move===this.state.stepNumber) {
-        return (
-          <li key={move}>
-            <button onClick={() => this.jumpTo(move)} className="highlight">{desc}</button>
-          </li>
-        );
-      } else {
-        return (
-          <li key={move}>
-            <button onClick={() => this.jumpTo(move)}>{desc}</button>
-          </li>
-        );
-      }
-    });
 
     let status;
     if (winner.name) {
@@ -226,14 +205,14 @@ class Game extends React.Component {
             onClick={(i) => this.handleClick(i)}
           />
         </div>
-        <div className="game-info">
-          <div>{status}</div>
-          <ol>{moves}</ol>
-        </div>
+
         <Chat
           room = {this.state.room}
         >
         </Chat>
+
+        <div>{ status }</div>
+
       </div>
     );
   }
