@@ -29,10 +29,10 @@ export class TicTacToe extends Room<State> {
   }
 
   onJoin (client: Client, options: any) {
+
     this.broadcast({
-      action: "chat",
-      playerSessionId: client.sessionId,
-      message: `${ client.sessionId } joined.`
+      action: "server-chat",
+      message: `Player joined.`
     });
 
     this.state.players[client.sessionId] = client.sessionId;
@@ -40,6 +40,11 @@ export class TicTacToe extends Room<State> {
     if (Object.keys(this.state.players).length === 2) {
       // Set the last player who joins as the first turn
       this.state.currentTurn = client.sessionId;
+
+      this.broadcast({
+        action: "server-chat",
+        message: `Game has begun!`
+      });
 
       // No more players
       this.lock();
