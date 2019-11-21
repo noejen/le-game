@@ -201,7 +201,11 @@ class Game extends React.Component {
     const current = history[history.length - 1];
     const squares = current.squares.slice();
 
-    this.state.room.send({ action: 'move', x: i%3, y: i/3 });
+    this.state.room.send({
+      action: 'move',
+      x: Math.floor(i%3),
+      y: Math.floor(i/3)
+    });
     squares[i] = this.state.xIsNext ? 'X' : 'O';
     this.setState({
       history: history.concat([{
