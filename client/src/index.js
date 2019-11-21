@@ -20,6 +20,39 @@ function Square(props) {
   }
 }
 
+class Players extends React.Component {
+  render() {
+    console.log('LIST', Object.keys(this.props.list).length,this.props.list, this.props.list.length);
+    return (
+      <div class="c-players">
+        <p>
+        {
+          Object.keys(this.props.list).length < 2 ?
+            'Waiting for players.' : 
+            'Players: ' + Object.keys(this.props.list).concat(' ')
+        }
+      </p>
+    </div>
+    );
+  }
+}
+
+class NextMoveStatus extends React.Component {
+  render() {
+    return (
+    <div class="c-next-move-status">
+      <p>
+        {
+          this.props.currentTurn === undefined ? 
+            'Game not started.' :
+            'Current turn: ' + this.props.currentTurn
+        }
+      </p>
+      </div>
+      );
+  }
+}
+
 class Board extends React.Component {
 
   renderSquare(i) {
@@ -185,19 +218,11 @@ class Game extends React.Component {
     const current = history[this.state.stepNumber];
     const winner = { name: null, squares: [] };
 
-    let status;
-    if (winner.name) {
-      status = 'Winner: ' + winner.name;
-    } else {
-      status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
-    }
     return (
       <div className="game">
-        { this.state.currentTurn === undefined &&
-          <div>
-            Waiting for players
-          </div>
-        }
+        <div className="game-players">
+          <Players list={this.state.players} />
+        </div>
         <div className="game-board">
           <Board
             squaresHighlight={winner.squares}
@@ -211,8 +236,9 @@ class Game extends React.Component {
         >
         </Chat>
 
-        <div>{ status }</div>
-
+        <div className="game-winner">
+          <NextMoveStatus winner={this.state.winner} currentTurn={this.state.currentTurn} />
+        </div>
       </div>
     );
   }
