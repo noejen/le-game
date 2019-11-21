@@ -47,6 +47,54 @@ class Board extends React.Component {
   }
 }
 
+class Chat extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      input: '',
+      messages: []
+    };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+  
+  handleChange(event) {
+    this.setState({input: event.target.value});
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+
+    if(this.state.input === '') {
+      return;
+    }
+
+    this.props.room.send({
+      action: 'chat',
+      message: this.state.input 
+    });
+
+    this.setState({input: ''});
+  }
+
+  render() {
+    return (
+      <div className="game">
+        <form id="form" onSubmit={this.handleSubmit}>
+          <input type="text" id="input" value={this.state.input} onChange={this.handleChange} />
+          <input type="submit" value="send" />
+        </form>
+        <div id="messages">
+          {this.state.messages.map((message, index) => (
+            <p key={index}>{message}</p>
+          ))}
+        </div>
+      </div>
+    );
+  }
+}
+
 class Game extends React.Component {
 
   constructor() {
@@ -104,19 +152,6 @@ class Game extends React.Component {
       room.onLeave(() => {
         console.log(client.id, "left", room.name);
       });
-
-      document.querySelector("#form").onsubmit = function(e) {
-        e.preventDefault();
-        var input = document.querySelector("#input");
-        console.log("input:", input.value);
-        // send data to room
-        room.send({ 
-          action: 'chat',
-          message: input.value 
-        });
-        // clear input
-        input.value = "";
-      }
 
     }).catch(e => {
       console.log("JOIN ERROR", e);
@@ -179,12 +214,12 @@ class Game extends React.Component {
     }
     return (
       <div className="game">
-        <div className="game-board">
         { this.state.currentTurn === undefined &&
           <div>
             Waiting for players
           </div>
         }
+        <div className="game-board">
           <Board
             squaresHighlight={winner.squares}
             squares={current.squares}
@@ -195,6 +230,10 @@ class Game extends React.Component {
           <div>{status}</div>
           <ol>{moves}</ol>
         </div>
+        <Chat
+          room = {this.state.room}
+        >
+        </Chat>
       </div>
     );
   }
