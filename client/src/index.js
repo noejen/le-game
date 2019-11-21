@@ -28,7 +28,7 @@ class Players extends React.Component {
         <p>
         {
           Object.keys(this.props.list).length < 2 ?
-            'Waiting for players.' : 
+            'Waiting for another player.' :
             'Players: ' + Object.keys(this.props.list).concat(' ')
         }
       </p>
@@ -39,17 +39,19 @@ class Players extends React.Component {
 
 class NextMoveStatus extends React.Component {
   render() {
+    let status = null;
+    if(this.props.room === null) {
+      status = '';
+    } else if(this.props.currentTurn === this.props.room.sessionId) {
+      status = 'It is your turn!';
+    } else if (this.props.currentTurn !== undefined) {
+      status = `It's ${this.props.currentTurn}'s turn!`;
+    }
     return (
-    <div class="c-next-move-status">
-      <p>
-        {
-          this.props.currentTurn === undefined ? 
-            'Game not started.' :
-            'Current turn: ' + this.props.currentTurn
-        }
-      </p>
+      <div class="c-next-move-status">
+        {status}
       </div>
-      );
+    );
   }
 }
 
@@ -193,7 +195,7 @@ class Game extends React.Component {
   }
 
   handleClick(i) {
-    if(!this.state.currentTurn) {
+    if(this.state.currentTurn !== this.state.room.sessionId) {
       return;
     }
 
@@ -241,7 +243,11 @@ class Game extends React.Component {
         </Chat>
 
         <div className="game-winner">
-          <NextMoveStatus winner={this.state.winner} currentTurn={this.state.currentTurn} />
+          <NextMoveStatus
+            winner={this.state.winner}
+            room={this.state.room}
+            currentTurn={this.state.currentTurn}
+          />
         </div>
       </div>
     );
