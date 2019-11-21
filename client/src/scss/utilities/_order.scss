@@ -1,0 +1,19 @@
+// Ordering
+// Used for changing the order of flex items on different screen sizes
+$inuit-order-max: 4;
+@for $i from 1 through $inuit-order-max {
+  .u-order-#{$i} {
+    order: #{$i};
+  }
+}
+@if (variable-exists(mq-breakpoints)) {
+  @each $inuit-bp-name, $inuit-bp-value in $mq-breakpoints {
+    @include mq($from: $inuit-bp-name) {
+      @for $i from 1 through $inuit-order-max {
+        .u-order-#{$i}\@#{$inuit-bp-name} {
+          order: #{$i};
+        }
+      }
+    }
+  }
+}

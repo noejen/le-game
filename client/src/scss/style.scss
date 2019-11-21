@@ -1,0 +1,49 @@
+/**
+ * [1] Settings         Scss vars, used with preprocessors and contain font, colors definitions, etc.
+ * [2] Tools            Globally used mixins and functions.
+ * [3] Generics         Reset and/or normalize styles, box-sizing definition, etc. This is the first layer which generates actual CSS.
+ * [4] Elements         Styling for bare HTML elements (like H1, A, etc.). These come with default styling from the browser so we can redefine them here.
+ * [5] Objects          Objects and abstractions, class-based selectors which define undecorated design patterns, for example media object known from OOCSS.
+ * [6] Components       Specific UI components. This is where majority of our work takes place and our UI components are often composed of Objects and Components.
+ * [7] Utilities        Overrides and helper classes with ability to override anything which goes before in the triangle. !important is often used.
+ */
+@import "~inuitcss/settings/settings.core";
+@import 'settings';
+/*----------------------------------------------------------------------
+[2] Tools & Resources
+----------------------------------------------------------------------*/
+// Media Queries with superpowers (https://github.com/sass-mq/sass-mq):
+@import '~sass-mq';
+// Inuitcss.
+@import '~inuitcss/tools/tools.clearfix';
+/*----------------------------------------------------------------------
+[3] Generics
+----------------------------------------------------------------------*/
+@import "~inuitcss/generic/generic.normalize";
+@import "~inuitcss/generic/generic.reset";
+
+/*----------------------------------------------------------------------
+[4] Elements
+----------------------------------------------------------------------*/
+@import 'elements/headings';
+@import 'elements/forms';
+
+/*----------------------------------------------------------------------
+[5] Objects
+----------------------------------------------------------------------*/
+@import "~inuitcss/objects/objects.layout";
+@import "~inuitcss/objects/objects.wrapper";
+@import "~inuitcss/objects/objects.box";
+@import "~inuit-flexgrid/objects/objects.grid";
+
+/*----------------------------------------------------------------------
+[6]  Components
+----------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------
+[7]  Utilities
+----------------------------------------------------------------------*/
+@import "~inuitcss/utilities/utilities.widths";
+@import "utilities/spacings";
+@import "utilities/text";
+@import "utilities/hide";

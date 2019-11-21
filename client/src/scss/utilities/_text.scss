@@ -1,0 +1,27 @@
+.u-text-center {
+    text-align: center !important;
+}
+
+.u-text-center\@mobile {
+    @include mq($until: tablet){
+        text-align: center !important;
+    }
+}
+
+.u-text-center\@wide {
+    @include mq($from: mobile){
+        text-align: center !important;
+    }
+}
+
+.u-text-right {
+    text-align: right;
+}
+
+.u-text-left {
+    text-align: left;
+}
+
+.u-text-no-padding {
+    padding: 0;
+}  
