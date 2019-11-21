@@ -4,7 +4,9 @@
   "description": "le-game is awesome",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "watch": "webpack --watch"
   },
   "repository": {
     "type": "git",
@@ -15,5 +17,16 @@
   "bugs": {
     "url": "https://github.com/noejen/le-game/issues"
   },
-  "homepage": "https://github.com/noejen/le-game#readme"
+  "homepage": "https://github.com/noejen/le-game#readme",
+  "devDependencies": {
+    "css-loader": "^3.2.0",
+    "inuit-flexgrid": "^0.4.0",
+    "inuitcss": "^6.0.0",
+    "mini-css-extract-plugin": "^0.8.0",
+    "node-sass": "^4.13.0",
+    "sass-loader": "^8.0.0",
+    "style-loader": "^1.0.0",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10"
+  }
 }

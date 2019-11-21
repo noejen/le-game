@@ -1,0 +1,63 @@
+// Colors.
+// Defaults
+$color-primary:           #86bca8;
+$color-secondary:         #ffffff;
+$color-background:        #f6f6f6;
+$color-gray:              #a0aec0;
+$color-dark:              #333333;
+$color-black:             #000000;
+$color-white:             #ffffff;
+$color-orange:            #fcb75a;
+
+
+// Assigned variants
+$color-primary-dark:   darken($color-primary, 5%);
+$color-primary-darker: darken($color-primary, 10%);
+$color-primary-light:  lighten($color-primary, 30%);
+$color-link:           $color-primary;
+$color-border:         $color-dark;
+$color-headings:       $color-dark;
+
+// Font.
+$primary-font-family: Carnero W01, Maven Pro, Helvetica Neue, Helvetica, Arial, system-ui, BlinkMacSystemFont, -apple-system, sans-serif;
+$serif-font-family: ITC Cheltenham W02,Constantia,Lucida Bright,Lucidabright,Lucida Serif,Lucida,DejaVu Serif,Bitstream Vera Serif,Liberation Serif,Georgia,serif;
+
+
+$inuit-global-font-size:    16px !default;
+$inuit-offsets: false;
+$inuit-global-spacing-unit: 2rem;
+$inuit-global-spacing-unit-large: 5rem;
+
+$inuit-wrapper-width: 1240px;
+
+// Define default breakpoints.
+$breakpoint-mobile: 576px !default;
+$breakpoint-tablet: 768px !default;
+$breakpoint-desktop: 992px !default;
+$breakpoint-wide: 1200px !default;
+
+// To enable support for browsers that do not support @media queries,
+// (IE <= 8, Firefox <= 3, Opera <= 9) set $mq-responsive to false
+// Create a separate stylesheet served exclusively to these browsers,
+// meaning @media queries will be rasterized, relying on the cascade itself
+$mq-responsive: true !default;
+
+// Name your breakpoints in a way that creates a ubiquitous language
+// across team members. It will improve communication between
+// stakeholders, designers, developers, and testers.
+$mq-breakpoints: (
+    mobile: $breakpoint-mobile,
+    tablet: $breakpoint-tablet,
+    desktop: $breakpoint-desktop,
+    wide: $breakpoint-wide
+) !default;
+
+// Define the breakpoint from the $mq-breakpoints list that should
+// be used as the target width when outputting a static stylesheet
+// (i.e. when $mq-responsive is set to 'false').
+$mq-static-breakpoint: desktop !default;
+
+// If you want to display the currently active breakpoint in the top
+// right corner of your site during development, add the breakpoints
+// to this list, ordered by width, e.g. (mobile, tablet, desktop).
+$mq-show-breakpoints: ();
