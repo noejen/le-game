@@ -71,9 +71,11 @@ export class TicTacToe extends Room<State> {
 
           if (this.isWin()) {
             // Game ends with a win
+            console.log('Game End', 'Winner is:', client.sessionId);
             this.state.winner = client.sessionId;
           } else if (this.isBoardFull()) {
             // Game ends in a draw
+            console.log('Game End', 'Winner is:', 'Draw');
             this.state.draw = true;
           } else {
             // Next turn
@@ -92,7 +94,8 @@ export class TicTacToe extends Room<State> {
   }
 
   isBoardFull() {
-
+    let openSlots = this.state.board.filter(item => item === 0);
+    return openSlots.length === 0;
   }
 
   onLeave (client: Client, consented: boolean) {
