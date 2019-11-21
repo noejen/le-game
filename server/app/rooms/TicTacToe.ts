@@ -29,8 +29,11 @@ export class TicTacToe extends Room<State> {
   }
 
   onJoin (client: Client, options: any) {
-    this.broadcast(`${ client.sessionId } joined.`);
-
+    this.broadcast({
+      action: "chat",
+      playerSessionId: client.sessionId,
+      message: `${ client.sessionId } joined.`
+    });
 
     this.state.players[client.sessionId] = client.sessionId;
 
@@ -50,7 +53,7 @@ export class TicTacToe extends Room<State> {
       this.broadcast({
         action: data.action,
         playerSessionId: client.sessionId,
-        message:`${ data.message }`
+        message: `${ data.message }`
       });
     }
 
@@ -65,11 +68,11 @@ export class TicTacToe extends Room<State> {
         const playersSessionIDs = Object.keys(this.state.players);
         const index = data.x + (BOARD_WIDTH * data.y);
 
-        if (this.stage.board[index] === 0) {
-          const playerMove = (client.sessionId === playerIds[0]) ? 1 : 2;
-          this.stage.board[index] = playerMove;
+        if (this.state.board[index] === 0) {
+          const playerMove = (client.sessionId === playersSessionIDs[0]) ? 1 : 2;
+          this.state.board[index] = playerMove;
 
-          if (this.isWin()) {
+          if (this.isWin(data.x, data.y, playerMove)) {
             // Game ends with a win
             console.log('Game End', 'Winner is:', client.sessionId);
             this.state.winner = client.sessionId;
@@ -79,18 +82,64 @@ export class TicTacToe extends Room<State> {
             this.state.draw = true;
           } else {
             // Next turn
-            this.state.currentTurn = (client.sessionId === playerIds[0]) ? playerIds[1] : playerIds[0];
+            this.state.currentTurn = (client.sessionId === playersSessionIDs[0]) ? playersSessionIDs[1] : playersSessionIDs[0];
           }
         }
       }
     }
-    
-    
-
   }
 
-  isWin() {
+  isWin(x: number, y: number, playerMove: number):boolean {
+    let win = false;
+    
+    // col
+    for (let col = 0; col < BOARD_WIDTH; col++) {
+      const index = x + (BOARD_WIDTH * col);
+      if (this.state.board[index] !== playerMove) {
+        break;
+      }
+      if (col == BOARD_WIDTH - 1) {
+        win = true;
+      }
+    }
 
+    // row
+    for (let row = 0; row < BOARD_WIDTH; row++) {
+      const index = row + (BOARD_WIDTH * y);
+      if (this.state.board[index] !== playerMove) {
+        break;
+      }
+      if (row == BOARD_WIDTH - 1) {
+        win = true;
+      }
+    }
+
+    // diag
+    if (x === y) {
+      for (let xy = 0; xy < BOARD_WIDTH; xy++) {
+        const index = xy + (BOARD_WIDTH * xy);
+        if (this.state.board[index] !== playerMove) {
+          break;
+        }
+        if (xy == BOARD_WIDTH - 1) {
+          win = true;
+        }
+      }
+    }
+
+    // back Diag
+    for (let col = 0; x < BOARD_WIDTH; col++) {
+      const row = (BOARD_WIDTH - 1) - col;
+      const index = col + BOARD_WIDTH * row;
+      if (this.state.board[index] !== playerMove) { 
+        break; 
+      }
+      if (col == BOARD_WIDTH - 1) {
+        win = true;
+      }
+    }
+
+    return win;
   }
 
   isBoardFull() {
@@ -100,6 +149,8 @@ export class TicTacToe extends Room<State> {
 
   onLeave (client: Client, consented: boolean) {
     this.broadcast(`${ client.sessionId } left.`);
+
+    delete this.state.players[ client.sessionId ];
   }
 
   onDispose() {
