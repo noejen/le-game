@@ -33,7 +33,7 @@ export class TicTacToe extends Room<State> {
 
     if(Object.keys(this.state.players).length === 2) {
       // Set the last player who joins as the first turn
-      this.stage.currentTurn = client.sessionId;
+      this.state.currentTurn = client.sessionId;
 
       // No more players
       this.lock();
