@@ -41,6 +41,23 @@ export class TicTacToe extends Room<State> {
   }
 
   onMessage (client: Client, message: any) {
+    // If a gamestate is win or draw, we don't respond to any more messages.
+    if (this.state.winner || this.state.draw) {
+      return false;
+    }
+
+    // We only listen for messages from the player who's current turn it is
+    if(client.sessionId === this.state.currentTurn) {
+      const playersSessionIDs = Object.keys(this.state.players);
+    }
+  }
+
+  isWin() {
+
+  }
+
+  isBoardFull() {
+
   }
 
   onLeave (client: Client, consented: boolean) {
