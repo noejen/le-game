@@ -45,13 +45,39 @@ body {
     background: #ddd;
   }
   
-  .game {
-  }
+.game {
+  max-width: 500px;
+  margin: 0 auto;
+  text-align: center;
+}
   
-  .game-info {
-    margin-left: 20px;
-  }
-  
-  .c-players {
-    
-  }
+.game-board {
+  display: inline-block;
+}
+
+.game-status {
+  margin-top: 30px;
+}
+
+.game-chat {
+  margin-top: 30px;
+  text-align: left;
+  background-color: #f4f4f4;
+  padding: 10px;
+}
+
+.game-chat .chat-controls {
+  margin: 10px 0 0;
+}
+
+.game-chat .chat-controls form, 
+.game-chat .chat-controls .chat-input {
+  width: 100%;
+}
+.game-chat .chat-controls form {
+  display: flex;
+}
+
+.game-chat p {
+  margin: 0 0 5px;
+}

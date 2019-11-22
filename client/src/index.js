@@ -5,48 +5,42 @@ import * as Colyseus from "colyseus.js";
 import './index.css';
 
 function Square(props) {
-  if (!props.highlight) {
-    return (
-      <button className="square" onClick={() => props.onClick()}>
-        {props.value}
-      </button>
-    );
-  } else {
-    return (
-      <button className="square highlight" onClick={() => props.onClick()}>
-        {props.value}
-      </button>
-    );
+  let value = '';
+  if (props.value === 1) {
+    value = 'X';
+  } else if (props.value === 2) {
+    value = 'O';
   }
+
+  return (
+    <button className="square" onClick={() => props.onClick()}>
+      {value}
+    </button>
+  );
 }
 
-class Players extends React.Component {
-  render() {
-    console.log('LIST', Object.keys(this.props.list).length,this.props.list, this.props.list.length);
-    return (
-      <div class="c-players">
-        <p>
-        {
-          Object.keys(this.props.list).length < 2 ?
-            'Waiting for another player.' :
-            'Players: ' + Object.keys(this.props.list).concat(' ')
-        }
-      </p>
-    </div>
-    );
-  }
-}
-
-class NextMoveStatus extends React.Component {
+class GameStatus extends React.Component {
   render() {
     let status = null;
     if(this.props.room === null) {
       status = '';
+    } else if(this.props.currentTurn === undefined) {
+      status = 'Waiting for opponent...';
     } else if(this.props.currentTurn === this.props.room.sessionId) {
-      status = 'It is your turn!';
+      status = 'Your turn!';
     } else if (this.props.currentTurn !== undefined) {
-      status = `It's ${this.props.currentTurn}'s turn!`;
+      status = `Opponent's turn.`;
     }
+
+    if(this.props.winner) {
+      if(this.props.winner === this.props.room.sessionId) {
+        status = `You won! :D`;
+      } else {
+        status = `You lost :(`;
+      }
+      
+    }
+
     return (
       <div class="c-next-move-status">
         {status}
@@ -57,28 +51,34 @@ class NextMoveStatus extends React.Component {
 
 class Board extends React.Component {
 
-  renderSquare(i) {
+  renderSquare(index) {
     return (
       <Square
-        highlight={this.props.squaresHighlight.includes(i)}
-        value={this.props.squares[i]}
-        onClick={() => this.props.onClick(i)}
+        value={this.props.boardstate[index]}
+        onClick={() => this.props.onClick(index)}
       />
     );
   }
 
   render() {
-    let rows = Array(3).fill(null);
-    for(let x=0; x<3; x++) {
-      let cols = Array(3).fill(null);
-      for(let y=0; y<3; y++) {
-        cols[y] = this.renderSquare((x*3)+y);
-      }
-      rows[x] = React.createElement('div', {className: "board-row"}, cols);
+    const board_width = Math.sqrt(this.props.boardstate.length);
+    
+    if(board_width % 1 !== 0) {
+      return false;
     }
+
+    let rows = [];
+    for (let y = 0; y < board_width; y++){
+      let row = [];
+      for (let x = 0; x < board_width; x++) {
+        row.push( this.renderSquare(x+(board_width*y)) );
+      }
+      rows[y] = React.createElement('div', {className: "board-row"}, row);
+    }
+
     return (
       React.createElement('div', null, rows)
-    );
+    ); 
   }
 }
 
@@ -87,8 +87,8 @@ class Chat extends React.Component {
     super();
     this.state = {
       input: '',
-      messages: []
     };
+
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -115,15 +115,17 @@ class Chat extends React.Component {
 
   render() {
     return (
-      <div className="game">
-        <form id="form" onSubmit={this.handleSubmit}>
-          <input type="text" id="input" value={this.state.input} onChange={this.handleChange} />
-          <input type="submit" value="send" />
-        </form>
-        <div id="messages">
-          {this.state.messages.map((message, index) => (
+      <div>
+        <div class="chat-messages">
+          {this.props.messages.map((message, index) => (
             <p key={index}>{message}</p>
           ))}
+        </div>
+        <div class="chat-controls">
+          <form onSubmit={this.handleSubmit}>
+            <input class="chat-input" type="text" value={this.state.input} onChange={this.handleChange} />
+            <input class="chat-submit" type="submit" value="Send" />
+          </form>
         </div>
       </div>
     );
@@ -135,19 +137,15 @@ class Game extends React.Component {
   constructor() {
     super();
     this.state = {
-      history: [{
-        squares: Array(9).fill(null),
-      }],
-      stepNumber: 0,
-      xIsNext: true,
-      
       room: null,
       
-      board: null,
+      board: [],
       players: [],
       currentTurn: '',
       winner: '',
       draw: false,
+
+      chatMessages: []
     };
 
     var client = new Colyseus.Client('ws://localhost:2567');
@@ -171,12 +169,15 @@ class Game extends React.Component {
       });
     
       room.onMessage((data) => {
-        console.log(client.id, "received on", room.name, data);
-
         if (data.action === "chat") {
-          var p = document.createElement("p");
-          p.innerHTML = `${data.playerSessionId}: ${data.message}`;
-          document.querySelector("#messages").appendChild(p);
+          let playerLabel = (this.state.room.sessionId === data.playerSessionId) ? 'You' : 'Opponent';
+
+          this.state.chatMessages.push(`${playerLabel}: ${data.message}`);
+          this.forceUpdate();
+        }
+        if (data.action === "server-chat") {
+          this.state.chatMessages.push(`${data.message}`);
+          this.forceUpdate();
         }
       });
     
@@ -194,61 +195,53 @@ class Game extends React.Component {
 
   }
 
-  handleClick(i) {
+  handleClick(index) {
     if(this.state.currentTurn !== this.state.room.sessionId) {
       return;
     }
 
-    const history = this.state.history.slice(0, this.state.stepNumber + 1);
-    const current = history[history.length - 1];
-    const squares = current.squares.slice();
+    const board_width = Math.sqrt(this.state.board.length);
+    
+    if(board_width % 1 !== 0) {
+      return false;
+    }
 
     this.state.room.send({
       action: 'move',
-      x: Math.floor(i%3),
-      y: Math.floor(i/3)
-    });
-    squares[i] = this.state.xIsNext ? 'X' : 'O';
-    this.setState({
-      history: history.concat([{
-        squares: squares,
-      }]),
-      stepNumber: history.length,
-      xIsNext: !this.state.xIsNext,
+      x: Math.floor(index % board_width),
+      y: Math.floor(index / board_width)
     });
   }
 
 
   render() {
-    const history = this.state.history;
-    const current = history[this.state.stepNumber];
-    const winner = { name: null, squares: [] };
 
     return (
       <div className="game">
-        <div className="game-players">
-          <Players list={this.state.players} />
-        </div>
+        <h1>Le Game - TicTacToe</h1>
+
         <div className="game-board">
           <Board
-            squaresHighlight={winner.squares}
-            squares={current.squares}
+            boardstate={this.state.board}
             onClick={(i) => this.handleClick(i)}
           />
         </div>
 
-        <Chat
-          room = {this.state.room}
-        >
-        </Chat>
-
-        <div className="game-winner">
-          <NextMoveStatus
+        <div className="game-status">
+          <GameStatus
             winner={this.state.winner}
             room={this.state.room}
             currentTurn={this.state.currentTurn}
           />
         </div>
+
+        <div className="game-chat">
+          <Chat 
+            room={this.state.room} 
+            messages={this.state.chatMessages}
+          />
+        </div>
+        
       </div>
     );
   }
