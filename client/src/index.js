@@ -42,7 +42,7 @@ class GameStatus extends React.Component {
     }
 
     return (
-      <div class="c-next-move-status">
+      <div className="next-move-status">
         {status}
       </div>
     );
@@ -54,6 +54,7 @@ class Board extends React.Component {
   renderSquare(index) {
     return (
       <Square
+        key={index}
         value={this.props.boardstate[index]}
         onClick={() => this.props.onClick(index)}
       />
@@ -73,7 +74,7 @@ class Board extends React.Component {
       for (let x = 0; x < board_width; x++) {
         row.push( this.renderSquare(x+(board_width*y)) );
       }
-      rows[y] = React.createElement('div', {className: "board-row"}, row);
+      rows[y] = React.createElement('div', {className: "board-row", key:y}, row);
     }
 
     return (
@@ -116,15 +117,15 @@ class Chat extends React.Component {
   render() {
     return (
       <div>
-        <div class="chat-messages">
+        <div className="chat-messages">
           {this.props.messages.map((message, index) => (
             <p key={index}>{message}</p>
           ))}
         </div>
-        <div class="chat-controls">
+        <div className="chat-controls">
           <form onSubmit={this.handleSubmit}>
-            <input class="chat-input" type="text" value={this.state.input} onChange={this.handleChange} />
-            <input class="chat-submit" type="submit" value="Send" />
+            <input className="chat-input" type="text" value={this.state.input} onChange={this.handleChange} />
+            <input className="chat-submit" type="submit" value="Send" />
           </form>
         </div>
       </div>
